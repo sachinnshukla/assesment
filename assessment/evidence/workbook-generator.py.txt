@@ -1,0 +1,103 @@
+import json
+import sys
+from pathlib import Path
+from openpyxl import Workbook, load_workbook
+from openpyxl.styles import Alignment, Font, PatternFill
+from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.datavalidation import DataValidation
+
+root = Path(__file__).parent
+output = root / "TaskBoard-manual-test-cases.xlsx"
+cases = [
+    ("E2E-01","P0","E2E","Admin can sign in and open a project","QA app and seeded database running","Open /login; sign in as Meera; open Q3 Launch.","Seeded Meera account","Dashboard lists projects and Q3 Launch board displays its tasks."),
+    ("E2E-02","P1","E2E","Signed-in user can sign out","Signed in as seeded user","Select sign out; open /dashboard.","Any seeded user","Session clears and browser returns to sign in."),
+    ("UI-01","P0","UI","Invalid credentials produce a helpful error","QA app running","Open sign in; enter Meera's email and an incorrect password; submit.","Wrong password","Sign-in remains on page with invalid-credentials message."),
+    ("UI-02","P1","UI","Registration rejects short passwords","QA app running","Open registration; enter a valid name/email and a five-character password; submit.","Short test password","Submission is prevented and password minimum is communicated."),
+    ("UI-03","P1","UI","Project board and task details render","Signed in as admin; Q3 Launch available","Open Q3 Launch; inspect columns and open an existing task; cancel.","Q3 Launch","Four status columns and task details appear; cancel leaves data unchanged."),
+    ("UI-04","P1","UI","Viewer sees read-only task controls","Signed in as Dev, a viewer","Open Q3 Launch; inspect add-task form and task details.","Viewer account","Creation, save, and delete actions are hidden or disabled for a viewer."),
+    ("UI-05","P1","UI","Add-task form fits a mobile viewport","Q3 Launch open","Set browser viewport to 390 x 844; inspect page width and add button.","390px viewport","All controls fit without horizontal overflow."),
+    ("UI-06","P1","UI","Non-member cannot view project","Signed in as Dev","Navigate directly to the seeded Internal Tools Cleanup project URL.","Viewer account","Access denied; project contents are not displayed."),
+    ("API-01","P0","API","Valid login","QA seed users available","POST /api/auth/login with valid seeded admin credentials.","Meera demo credentials from README","HTTP 200 and a token returned; do not record token."),
+    ("API-02","P0","API","Invalid password rejected","QA seed users available","POST /api/auth/login using invalid password.","Meera email and incorrect password","HTTP 401."),
+    ("API-03","P0","API","Anonymous project list denied","No token","GET /api/projects without authorization.","None","HTTP 401."),
+    ("API-04","P1","API","Viewer sees only membership projects","Signed in as Dev","GET /api/projects with viewer bearer token.","Dev demo account","HTTP 200; exactly Q3 Launch in seeded dataset."),
+    ("API-05","P0","API","Non-member project detail denied","Signed in as Dev","GET /api/projects/:id for Internal Tools Cleanup.","Viewer token; private project ID","HTTP 403 and no project data."),
+    ("API-06","P0","API","Viewer cannot create tasks","Signed in as Dev","POST a new task to Q3 Launch.","Viewer token; harmless test title","HTTP 403 and no task created."),
+    ("API-07","P0","API","Viewer cannot update tasks","Disposable QA database only; signed in as Dev","PATCH an isolated Q3 Launch task title as viewer.","Viewer token; isolated task ID","HTTP 403 and task unchanged."),
+    ("API-08","P0","API","Non-member cannot update tasks","Disposable QA database only; signed in as Lina","PATCH an isolated Q3 Launch task title as non-member.","Non-member token; isolated task ID","HTTP 403 and task unchanged."),
+    ("API-09","P1","API","Invalid registration rejected","QA app running","POST /api/auth/register with malformed email and short password.","Malformed email; short password","HTTP 400 and no user created."),
+    ("API-10","P1","API","Task assignee must belong to project","Disposable QA database only; signed in as Meera","POST a Q3 Launch task assigning Lina, who is not a Q3 member.","Admin token; Lina user ID","Request rejected and no task assigned to a non-member."),
+    ("API-11","P1","API","Concurrent registration preserves unique emails","Disposable QA database only","Send five simultaneous registrations using the same new email; inspect status codes and database row count.","Unique test email","At most one registration succeeds and exactly one account exists."),
+    ("SEC-01","P0","Security","Project details do not expose password hashes","Signed in as project viewer","GET Q3 Launch detail; inspect field names only; do not record values.","Viewer token","No user passwordHash field in the response."),
+    ("SEC-02","P0","Security","Task search cannot bypass project filter","Isolated QA database; signed in as Dev","Search Q3 Launch using a quote/boolean test string; count tasks from other projects.","Read-only SQL quote test input","Only matching tasks belonging to Q3 Launch are returned."),
+    ("PERF-01","P1","Performance","Read-only API smoke baseline","Isolated QA app; no concurrent benchmark","Send 20 authenticated project-list reads with concurrency 2; record errors and p50/p95.","Seeded admin token","All responses succeed; record latency without claiming an SLA."),
+]
+
+if not output.exists():
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Test Cases"
+    headers = ["ID","Priority","Type","Scenario","Preconditions","Steps","Test data","Expected result",
+               "Playwright or script result","Observed result","Evidence","Manual status","Manual actual result","Manual tester","Defect"]
+    ws.append(headers)
+    for row in cases:
+        ws.append(list(row) + ["Not run", "", "", "Not run", "", "", ""])
+    ws.freeze_panes = "D2"
+    ws.auto_filter.ref = ws.dimensions
+    for col, width in enumerate([14,10,16,36,36,52,32,55,22,55,30,18,40,22,20], 1):
+        ws.column_dimensions[get_column_letter(col)].width = width
+    for cell in ws[1]:
+        cell.fill = PatternFill("solid", fgColor="17365D")
+        cell.font = Font(color="FFFFFF", bold=True)
+        cell.alignment = Alignment(wrap_text=True, vertical="top")
+    for row in ws.iter_rows(min_row=2):
+        for cell in row:
+            cell.alignment = Alignment(wrap_text=True, vertical="top")
+    validation = DataValidation(type="list", formula1='"Not run,Pass,Fail,Blocked"', allow_blank=False)
+    ws.add_data_validation(validation)
+    validation.add(f"L2:L{ws.max_row}")
+    info = wb.create_sheet("Instructions")
+    for line in [
+        "TaskBoard manual test cases",
+        "Use only the isolated QA instance supplied in the handoff; avoid production data.",
+        "Playwright or script results are separate from human manual results. Fill manual status, actual result and tester only after your own execution.",
+        "P0/P1 are test priorities, not a severity judgment. Do not copy tokens, credentials or password hashes into the workbook.",
+        "Performance is a bounded local baseline, not an SLA or capacity certification.",
+        "Known defects are documented separately; an observed failure must not be changed to Pass without evidence.",
+    ]:
+        info.append([line])
+    info.column_dimensions["A"].width = 110
+    for row in info.iter_rows():
+        row[0].alignment = Alignment(wrap_text=True, vertical="top")
+    wb.save(output)
+else:
+    wb = load_workbook(output)
+    ws = wb["Test Cases"]
+    existing = {row[0].value for row in ws.iter_rows(min_row=2)}
+    for row in cases:
+        if row[0] not in existing:
+            ws.append(list(row) + ["Not run", "", "", "Not run", "", "", ""])
+            for cell in ws[ws.max_row]:
+                cell.alignment = Alignment(wrap_text=True, vertical="top")
+        else:
+            for existing_row in ws.iter_rows(min_row=2):
+                if existing_row[0].value == row[0]:
+                    existing_row[7].value = row[7]
+                    break
+    ws.auto_filter.ref = ws.dimensions
+    for validation in ws.data_validations.dataValidation:
+        validation.sqref = f"L2:L{ws.max_row}"
+
+if len(sys.argv) > 1:
+    results = json.loads(Path(sys.argv[1]).read_text())
+    for row in ws.iter_rows(min_row=2):
+        result = results.get(row[0].value)
+        if result:
+            row[8].value = result["status"]
+            row[9].value = result["actual"]
+            row[10].value = result.get("evidence", result.get("executor", ""))
+            defects = {"SEC-02": "BUG-01", "SEC-01": "BUG-02", "API-07": "BUG-03",
+                       "API-08": "BUG-03", "API-11": "BUG-04"}
+            row[14].value = result.get("defect", defects.get(row[0].value, ""))
+wb.save(output)
+print(f"{output}: {ws.max_row - 1} cases")

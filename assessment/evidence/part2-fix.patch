@@ -1,0 +1,30 @@
+diff --git a/src/app/api/tasks/[id]/route.ts b/src/app/api/tasks/[id]/route.ts
+index 4b90b97..2597ce2 100644
+--- a/src/app/api/tasks/[id]/route.ts
++++ b/src/app/api/tasks/[id]/route.ts
+@@ -26,6 +26,12 @@ export async function PATCH(req: NextRequest, { params }: Params) {
+   const existing = await prisma.task.findUnique({ where: { id } });
+   if (!existing) return notFound("task not found");
+ 
++  const membership = await getProjectMembership(user.id, existing.projectId);
++  if (!membership) return forbidden("you are not a member of this project");
++  if (!canEditTasks(membership.role)) {
++    return forbidden("viewers cannot update tasks");
++  }
++
+   const task = await prisma.task.update({
+     where: { id },
+     data: parsed.data,
+diff --git a/src/tests/part2.test.ts b/src/tests/part2.test.ts
+index 5879c6c..240cac2 100644
+--- a/src/tests/part2.test.ts
++++ b/src/tests/part2.test.ts
+@@ -67,7 +67,7 @@ describe("task access control", () => {
+       },
+       body: JSON.stringify({ title: "viewer create attempt" }),
+     });
+-    expect(res.status).toBe(401);
++    expect(res.status).toBe(403);
+   });
+ 
+   // Test C
