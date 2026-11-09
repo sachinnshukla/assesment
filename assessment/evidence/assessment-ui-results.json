@@ -1,0 +1,49 @@
+{
+  "API-11": {
+    "status": "Fail",
+    "actual": "Five concurrent registrations with the same new test email all returned HTTP 201; PostgreSQL contained five matching users.",
+    "evidence": "API script and isolated PostgreSQL count"
+  },
+  "E2E-01": {
+    "status": "Pass",
+    "actual": "Admin login, dashboard and Q3 Launch navigation worked on recheck. Initially seven seed tasks; an isolated API test later added one task.",
+    "evidence": "Playwright MCP: 2026-11-09T16-23-38Z and 16-30-39Z"
+  },
+  "E2E-02": {
+    "status": "Pass",
+    "actual": "Viewer sign-out returned to login; opening dashboard redirected back to sign-in.",
+    "evidence": "Playwright MCP: 2026-11-09T16-26-53Z through 16-27-00Z"
+  },
+  "UI-01": {
+    "status": "Pass",
+    "actual": "Invalid password showed 'invalid credentials' and remained on login.",
+    "evidence": "Playwright MCP: 2026-11-09T16-23-27Z"
+  },
+  "UI-02": {
+    "status": "Pass",
+    "actual": "Registration with a five-character password was prevented by native minimum-length validation.",
+    "evidence": "Playwright MCP: 2026-11-09T16-26-33Z"
+  },
+  "UI-03": {
+    "status": "Pass",
+    "actual": "Admin project displayed four columns; task details opened and cancel closed the editor without saving on recheck.",
+    "evidence": "Playwright MCP: 2026-11-09T16-30-21Z through 16-30-24Z"
+  },
+  "UI-04": {
+    "status": "Fail",
+    "actual": "Viewer saw an enabled add form and task editor with save and delete controls.",
+    "evidence": "Playwright MCP: 2026-11-09T16-26-00Z",
+    "defect": "Viewer controls; API-07"
+  },
+  "UI-05": {
+    "status": "Fail",
+    "actual": "At 390px viewport, document width was 414px and add button extended beyond viewport.",
+    "evidence": "Playwright MCP: 2026-11-09T16-25-46Z",
+    "defect": "Mobile overflow"
+  },
+  "UI-06": {
+    "status": "Pass",
+    "actual": "Direct navigation to non-member project showed 'you are not a member of this project'.",
+    "evidence": "Playwright MCP: 2026-11-09T16-26-18Z"
+  }
+}

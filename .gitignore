@@ -11,6 +11,8 @@ dist/
 
 # testing
 coverage/
+assessment/framework/test-results/
+assessment/framework/playwright-report/
 
 # misc
 .DS_Store

@@ -2,6 +2,17 @@
 
 A Next.js 15 fullstack application for managing projects, tasks, and team members. TypeScript + Prisma + PostgreSQL on the server, React 19 + TanStack Query on the client.
 
+Assessment artifacts, manual cases, and hybrid test instructions are in [`assessment/README.md`](assessment/README.md).
+
+## Assessment submission
+
+- [Prioritized bug report and curl proofs](BUGS.md)
+- [Part 2 diagnosis and before/after test output](TEST_OUTPUT.md)
+- [Manual test cases and hybrid framework](assessment/README.md)
+- **Screen and audio recording:** Pending — add the recording URL here.
+
+The recording was not made before the Part 2 fix; the documented test output does not replace the required narrated recording.
+
 ## Quick Setup (Docker — Recommended)
 
 ```bash

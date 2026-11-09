@@ -1,0 +1,67 @@
+{
+  "API-01": {
+    "status": "Pass",
+    "actual": "Valid seeded admin login returned HTTP 200 and a token.",
+    "executor": "API script"
+  },
+  "API-02": {
+    "status": "Pass",
+    "actual": "Invalid password returned HTTP 401.",
+    "executor": "API script"
+  },
+  "API-03": {
+    "status": "Pass",
+    "actual": "Unauthenticated project request returned HTTP 401.",
+    "executor": "API script"
+  },
+  "API-04": {
+    "status": "Pass",
+    "actual": "Viewer project list returned HTTP 200, 1 project(s).",
+    "executor": "API script"
+  },
+  "API-05": {
+    "status": "Pass",
+    "actual": "Non-member project detail returned HTTP 403.",
+    "executor": "API script"
+  },
+  "API-06": {
+    "status": "Pass",
+    "actual": "Viewer task creation returned HTTP 403.",
+    "executor": "API script"
+  },
+  "API-07": {
+    "status": "Fail",
+    "actual": "Viewer task update returned HTTP 200; expected 403.",
+    "executor": "API script"
+  },
+  "API-08": {
+    "status": "Fail",
+    "actual": "Non-member task update returned HTTP 200; expected 403.",
+    "executor": "API script"
+  },
+  "SEC-01": {
+    "status": "Fail",
+    "actual": "Project detail returned HTTP 200; passwordHash field present (values omitted).",
+    "executor": "API script"
+  },
+  "SEC-02": {
+    "status": "Fail",
+    "actual": "Search returned HTTP 200, 5 task(s) from other projects; literal search must not bypass project filter.",
+    "executor": "API script"
+  },
+  "API-09": {
+    "status": "Pass",
+    "actual": "Invalid registration returned HTTP 400.",
+    "executor": "API script"
+  },
+  "API-10": {
+    "status": "Blocked",
+    "actual": "Task creation with a non-member assignee returned HTTP 201; whether this is prohibited requires a product decision.",
+    "executor": "API script"
+  },
+  "PERF-01": {
+    "status": "Pass",
+    "actual": "Read-only local smoke: 20 requests, concurrency 2, 0 errors, p50 11.9 ms, p95 18.5 ms; no latency SLA assumed.",
+    "executor": "API script"
+  }
+}

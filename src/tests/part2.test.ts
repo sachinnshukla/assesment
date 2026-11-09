@@ -67,7 +67,7 @@ describe("task access control", () => {
       },
       body: JSON.stringify({ title: "viewer create attempt" }),
     });
-    expect(res.status).toBe(401);
+    expect(res.status).toBe(403);
   });
 
   // Test C

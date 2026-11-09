@@ -1,0 +1,15 @@
+
+> taskboard@0.1.0 test
+> vitest run src/tests/part2.test.ts
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v2.1.8 /Users/sachinshukla/.copilot/repos/iq-taskboard-assessment
+
+ ✓ src/tests/part2.test.ts (3 tests) 1128ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed (3)
+   Start at  22:18:02
+   Duration  1.55s (transform 24ms, setup 95ms, collect 7ms, tests 1.13s, environment 0ms, prepare 59ms)
+

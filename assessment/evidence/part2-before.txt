@@ -1,0 +1,59 @@
+
+> taskboard@0.1.0 test
+> vitest run src/tests/part2.test.ts
+
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m
+
+ RUN  v2.1.8 /Users/sachinshukla/.copilot/repos/iq-taskboard-assessment
+
+ ❯ src/tests/part2.test.ts (3 tests | 2 failed) 508ms
+   × task access control > a viewer cannot update a task 24ms
+     → expected 200 to be 403 // Object.is equality
+   × task access control > a viewer cannot create a task 7ms
+     → expected 403 to be 401 // Object.is equality
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/tests/part2.test.ts > task access control > a viewer cannot update a task
+AssertionError: expected 200 to be 403 // Object.is equality
+
+- Expected
++ Received
+
+- 403
++ 200
+
+ ❯ src/tests/part2.test.ts:57:24
+     55|       body: JSON.stringify({ title: "viewer update attempt" }),
+     56|     });
+     57|     expect(res.status).toBe(403);
+       |                        ^
+     58|   });
+     59| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/tests/part2.test.ts > task access control > a viewer cannot create a task
+AssertionError: expected 403 to be 401 // Object.is equality
+
+- Expected
++ Received
+
+- 401
++ 403
+
+ ❯ src/tests/part2.test.ts:70:24
+     68|       body: JSON.stringify({ title: "viewer create attempt" }),
+     69|     });
+     70|     expect(res.status).toBe(401);
+       |                        ^
+     71|   });
+     72| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 1 passed (3)
+   Start at  22:15:53
+   Duration  936ms (transform 27ms, setup 94ms, collect 7ms, tests 508ms, environment 0ms, prepare 76ms)
+
