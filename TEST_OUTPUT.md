@@ -82,6 +82,64 @@ AssertionError: expected 403 to be 401 // Object.is equality
 
 The task-update route now checks project membership and uses the existing `canEditTasks` helper before updating. Test B's expected status was changed from 401 to 403; test descriptions and setup were not changed.
 
+### Application fix: task-update authorization
+
+In [`src/app/api/tasks/[id]/route.ts`](src/app/api/tasks/%5Bid%5D/route.ts), these checks were added before `prisma.task.update()`:
+
+```ts
+const membership = await getProjectMembership(user.id, existing.projectId);
+if (!membership) return forbidden("you are not a member of this project");
+if (!canEditTasks(membership.role)) {
+  return forbidden("viewers cannot update tasks");
+}
+```
+
+Non-members and viewers are denied with HTTP 403. Authorized members can continue to the existing update operation. Authentication is checked separately at the start of the route.
+
+### Corrected test expectation
+
+In [`src/tests/part2.test.ts`](src/tests/part2.test.ts), the viewer-create test was corrected because the signed-in viewer is authenticated but lacks permission:
+
+```diff
+- expect(res.status).toBe(401);
++ expect(res.status).toBe(403);
+```
+
+This changes the test's expected status; the application fix above addresses the separate viewer-update defect.
+
+### Added regression tests
+
+[`src/tests/task-update-authorization.test.ts`](src/tests/task-update-authorization.test.ts) creates a task fixture, runs these checks, and deletes the fixture afterward. The following excerpts show the assertions:
+
+```ts
+it("rejects unauthenticated task updates", async () => {
+  expect((await updateTask()).status).toBe(401);
+});
+```
+
+```ts
+it("rejects a non-member without changing the task", async () => {
+  expect((await updateTask(outsiderToken)).status).toBe(403);
+  const res = await fetch(`${BASE_URL}/api/projects/${projectId}/tasks`, {
+    headers: { Authorization: `Bearer ${adminToken}` },
+  });
+  expect(res.status).toBe(200);
+  const { tasks } = (await res.json()) as { tasks: { id: string; title: string }[] };
+  expect(tasks.find((task) => task.id === taskId)?.title).toBe(initialTitle);
+});
+```
+
+```ts
+it("allows a project member to update a task", async () => {
+  const res = await updateTask(memberToken);
+  expect(res.status).toBe(200);
+  const { task } = (await res.json()) as { task: { title: string } };
+  expect(task.title).toBe("QA authorization regression updated");
+});
+```
+
+These are integration tests against a running application. Use a disposable database because the fixture is created, modified, and deleted. The viewer-update case remains in the original Part 2 suite.
+
 Command:
 
 ```bash
