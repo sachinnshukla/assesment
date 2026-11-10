@@ -1,0 +1,11 @@
+node_modules/
+assessment/framework/test-results/
+assessment/framework/playwright-report/
+coverage/
+.env
+.env.*
+!.env.example
+*.pem
+*.tsbuildinfo
+playwright-report/
+test-results/
