@@ -2,6 +2,8 @@
 
 This folder collects the assessment work without moving the required submission files or application code.
 
+**Screen and audio recording:** [Assessment walkthrough](https://www.loom.com/share/a11b85d7ef7948678778c85878f31d47).
+
 ## Contents
 
 - `plan.md`: assessment plan and sequence.
