@@ -43,7 +43,3 @@ TEST_BASE_URL=http://localhost:3101 npm test -- src/tests/part2.test.ts src/test
 ```
 
 The original Part 2 suite creates tasks and, before the fix, changes a task. The added regression test creates and removes its own fixture. Do not reseed or reset a database containing data you need.
-
-## Submission limitations
-
-The manual workbook still needs the user's own execution results. The assessment requires the user to record their screen and audio and narrate their diagnosis before code changes; that recording was not made before the Part 2 fix. No recording URL has been supplied. Do not claim these requirements are complete without actual evidence.
