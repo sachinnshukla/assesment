@@ -9,7 +9,7 @@ Assessment artifacts, manual cases, and hybrid test instructions are in [`assess
 - [Prioritized bug report and curl proofs](BUGS.md)
 - [Part 2 diagnosis and before/after test output](TEST_OUTPUT.md)
 - [Manual test cases and hybrid framework](assessment/README.md)
-- **Screen and audio recording:** Pending — add the recording URL here.
+- **Screen and audio recording:** [Assessment walkthrough](https://www.loom.com/share/a11b85d7ef7948678778c85878f31d47).
 
 The recording was not made before the Part 2 fix; the documented test output does not replace the required narrated recording.
 
